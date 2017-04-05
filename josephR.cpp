@@ -37,8 +37,7 @@ void pauseGame(int x, int y, Rect pausebox)
     pausebox.center = 0;
     ggprint16(&pausebox, 25, 0x00ffffff, "GAME PAUSED...");
     ggprint12(&pausebox, 20, 0x00ffffff, "Press P to Resume");
-    ggprint12(&pausebox, 20, 0x00ffffff, "Press R to Restart Level");
-    ggprint12(&pausebox, 20, 0x00ffffff, "Press L to Restart LVL1 --Soon");
+    ggprint12(&pausebox, 20, 0x00ffffff, "Press R to Restart Game");
     ggprint12(&pausebox, 20, 0x00ffffff, "Press E to Exit Game");
     glEnable(GL_TEXTURE_2D);
 
@@ -71,8 +70,7 @@ void deadGame(int x, int y, Rect pausebox)
     pausebox.center = 0;
     ggprint16(&pausebox, 25, 0x00ffffff, "YOU ARE DEAD!");
     ggprint16(&pausebox, 25, 0x00ffffff, "You hit too many objects!");
-    ggprint12(&pausebox, 20, 0x00ffffff, "Press R to Restart Level");
-    ggprint12(&pausebox, 20, 0x00ffffff, "Press L to Restart LVL1 --Soon");
+    ggprint12(&pausebox, 20, 0x00ffffff, "Press R to Restart Game");
     ggprint12(&pausebox, 20, 0x00ffffff, "Press E to Exit Game");
     glEnable(GL_TEXTURE_2D);
 
@@ -97,8 +95,7 @@ void strandedGame(int x, int y, Rect pausebox)
     pausebox.center = 0;
     ggprint16(&pausebox, 25, 0x00ffffff, "YOU ARE STRANDED!");
     ggprint16(&pausebox, 25, 0x00ffffff, "You are out of fuel!");
-    ggprint12(&pausebox, 20, 0x00ffffff, "Press R to Restart Level");
-    ggprint12(&pausebox, 20, 0x00ffffff, "Press L to Restart LVL1 --Soon");
+    ggprint12(&pausebox, 20, 0x00ffffff, "Press R to Restart Game");
     ggprint12(&pausebox, 20, 0x00ffffff, "Press E to Exit Game");
     glEnable(GL_TEXTURE_2D);
 

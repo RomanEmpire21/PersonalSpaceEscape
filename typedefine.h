@@ -98,24 +98,6 @@ struct HealthBox {
 
 };
 
-struct FuelBox {
-    Vec pos;
-    Vec vel;
-    Flt radius;
-    float angle;
-    float rotate;
-
-};
-struct AmoBox {
-    Vec pos;
-    Vec vel;
-    Flt radius;
-    float angle;
-    float rotate;
-
-};
-
-
 // Created by Joe
 struct Debris {
     Vec pos;
@@ -165,13 +147,7 @@ int fuelRemains(float fuel);
 float reduceFuel(float fuel);
 int remainingAmo(int bulletsRemain);
 int reduceAmo(int bulletsRemain);
-int getHealthPack(Game *g, HealthBox *healthbox, int &health);
-int getFuelPack(Game *g, FuelBox *fuelbox, float &fuel);
-int getAmoPack(Game *g, AmoBox *amobox, int &bulletsRemain);
-void DrawFuelBox(GLuint fuelBoxTexture, FuelBox *f);
-void DrawAmoBox(GLuint amoBoxTexture, AmoBox *a);
-void buildFuelBox(FuelBox *f);
-void buildAmoBox(AmoBox *a);
+void getHealthPack(Game *g, HealthBox *healthbox, int &health);
 //////////////////////////////////////////////////////////////////////////////////////
 void pauseGame(int xsize, int ysize, Rect pausebox);
 void deadGame(int xsize, int ysize, Rect pausebox);
