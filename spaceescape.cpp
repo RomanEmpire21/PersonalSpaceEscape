@@ -1,9 +1,12 @@
 //3350 Spring 2017
 //
-//program: asteroids.cpp
-//author:  Gordon Griesel
+//original program: asteroids.cpp
+//original author:  Gordon Griesel
 //date:    2014
 //mod spring 2015: added constructors
+//
+//modified by: Jonathan Roman, Chris Kelley, Sean Nickell, Joseph Ruiz
+//renamed to: spaceescape.cpp
 //
 //This program is a game starting point for 335
 //
@@ -26,6 +29,14 @@
 // sound
 // use of textures
 // 
+// SpaceEscape is a single-player, space shooting survival game, similar to
+// the classic Asteroids game. The main difference is the player has a limited
+// amount of fuel and ammunition, and can be hit three times prior to dying.
+// There are item drops to replenish your limited supplies that occur when you 
+// shoot an asteroid and you are running low. The goal is to survive as long
+// as possible until the wormhole opens up and you reach the next level and
+// get closer to Earth.
+//
 //
 #include <iostream>
 #include <cstdlib>
@@ -85,18 +96,17 @@ int sound = 1;
 /********************************************************/
 
 GLuint silhouetteTexture;
+GLuint silhouette_astronautpicTexturepic;
 
 Ppmimage *healthBox = NULL;
 GLuint healthBoxTexture;
 
-Ppmimage *fuelBox = NULL;
-GLuint fuelBoxTexture;
-
-Ppmimage *amoBox = NULL;
-GLuint amoBoxTexture;
-
 Ppmimage *Asteroidpic = NULL;
 GLuint AsteroidTexturepic;
+
+Ppmimage *astronautpic = NULL;
+GLuint astronautpicTexturepic;
+
 
 int xres=1250, yres=900;
 // Added by Joe
@@ -117,16 +127,10 @@ int keys[65536];
 // and bullets remain
 int health = 300;
 float fuel = 300;
-int bulletsRemain = 30;
+int bulletsRemain = 50;
 int dead = 0;
 Game game;
 HealthBox healthbox;
-FuelBox fuelbox;
-AmoBox amobox;
-
-int gotHealth = 0;
-int gotFuel = 0;
-int gotAmo = 0;
 
 int main(void)
 {
@@ -323,24 +327,6 @@ void init_opengl(void)
             healthBox->width, healthBox->height,
             0, GL_RGB, GL_UNSIGNED_BYTE, healthBox->data);
 
-    fuelBox= ppm6GetImage("./Images/Fuel.ppm");
-    glGenTextures(1, &fuelBoxTexture);
-    glBindTexture(GL_TEXTURE_2D, fuelBoxTexture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, 3,
-            fuelBox->width, fuelBox->height,
-            0, GL_RGB, GL_UNSIGNED_BYTE, fuelBox->data);
-
-    amoBox= ppm6GetImage("./Images/AmoPack.ppm");
-    glGenTextures(1, &amoBoxTexture);
-    glBindTexture(GL_TEXTURE_2D, amoBoxTexture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, 3,
-            amoBox->width, amoBox->height,
-            0, GL_RGB, GL_UNSIGNED_BYTE, amoBox->data);
-
 
     Asteroidpic= ppm6GetImage("./Images/Asteroid.ppm");
     glGenTextures(1, &AsteroidTexturepic);
@@ -351,6 +337,14 @@ void init_opengl(void)
             Asteroidpic->width, Asteroidpic->height,
             0, GL_RGB, GL_UNSIGNED_BYTE, Asteroidpic->data);
 
+    astronautpic= ppm6GetImage("./Images/Astronaut.ppm");
+    glGenTextures(1, &astronautpicTexturepic);
+    glBindTexture(GL_TEXTURE_2D, astronautpicTexturepic);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, 3,
+            astronautpic->width, astronautpic->height,
+            0, GL_RGB, GL_UNSIGNED_BYTE, astronautpic->data);
 
 
     int w = Asteroidpic->width;
@@ -364,7 +358,16 @@ void init_opengl(void)
     glTexImage2D(GL_TEXTURE_2D, 0,GL_RGBA, w, h, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, silhouetteData);
 
+    glGenTextures(1, &silhouette_astronautpicTexturepic);
+    glBindTexture(GL_TEXTURE_2D, silhouette_astronautpicTexturepic);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    unsigned char *silhouetteData2 = buildAlphaData(astronautpic);
+    glTexImage2D(GL_TEXTURE_2D, 0,GL_RGBA, w, h, 0,
+            GL_RGBA, GL_UNSIGNED_BYTE, silhouetteData2);
+
     free(silhouetteData);
+    free(silhouetteData2);
 
 
 
@@ -469,8 +472,6 @@ void init(Game *g)
         g->nasteroids++;
     }
     buildHealthBox(&healthbox);
-    buildFuelBox(&fuelbox);
-    buildAmoBox(&amobox);
     clock_gettime(CLOCK_REALTIME, &g->bulletTimer);
     memset(keys, 0, 65536);
 }
@@ -765,7 +766,8 @@ void physics(Game *g)
     }
 
 
-    // Health image
+
+
     healthbox.pos[0] += healthbox.vel[0];
     healthbox.pos[1] += healthbox.vel[1];
     //Check for collision with window edges
@@ -783,42 +785,6 @@ void physics(Game *g)
     }
     healthbox.angle += healthbox.rotate;
 
-    // Fuel image
-    fuelbox.pos[0] += fuelbox.vel[0];
-    fuelbox.pos[1] += fuelbox.vel[1];
-    //Check for collision with window edges
-    if (fuelbox.pos[0] < -100.0) {
-        fuelbox.pos[0] += (float)xres+200;
-    }
-    else if (fuelbox.pos[0] > (float)xres+100) {
-        fuelbox.pos[0] -= (float)xres+200;
-    }
-    else if (fuelbox.pos[1] < -100.0) {
-        fuelbox.pos[1] += (float)yres+200;
-    }
-    else if (fuelbox.pos[1] > (float)yres+100) {
-        fuelbox.pos[1] -= (float)yres+200;
-    }
-    fuelbox.angle += fuelbox.rotate;
-
-    // Amo pack image
-    amobox.pos[0] += amobox.vel[0];
-    amobox.pos[1] += amobox.vel[1];
-    //Check for collision with window edges
-    if (amobox.pos[0] < -100.0) {
-        amobox.pos[0] += (float)xres+200;
-    }
-    else if (amobox.pos[0] > (float)xres+100) {
-        amobox.pos[0] -= (float)xres+200;
-    }
-    else if (amobox.pos[1] < -100.0) {
-        amobox.pos[1] += (float)yres+200;
-    }
-    else if (amobox.pos[1] > (float)yres+100) {
-        amobox.pos[1] -= (float)yres+200;
-    }
-    amobox.angle += amobox.rotate;
-
 
 
 
@@ -829,16 +795,7 @@ void physics(Game *g)
     // astronaut. Was successful, code was moved into
     // jonathanR.cpp. 
     astronautCollision(g, health);
-    if (!gotHealth){
-    	gotHealth = getHealthPack(g, &healthbox, health);
-    }
-
-    if (!gotFuel){
-    	gotFuel = getFuelPack(g, &fuelbox, fuel);
-    }
-    if (!gotAmo){
-    	gotAmo = getAmoPack(g, &amobox, bulletsRemain);
-    }
+    getHealthPack(g, &healthbox, health);
 
     // Currently exits the game if all health is lost. Change
     // it so that the game starts over...
@@ -973,14 +930,14 @@ void physics(Game *g)
                 Bullet *b = &g->barr[g->nbullets];
                 timeCopy(&b->time, &bt);
                 b->pos[0] = g->astronaut.pos[0];
-                b->pos[1] = g->astronaut.pos[1];
+                b->pos[1] = g->astronaut.pos[1]+4;
                 b->vel[0] = g->astronaut.vel[0];
                 b->vel[1] = g->astronaut.vel[1];
                 //convert astronaut angle to radians
-                Flt rad = ((g->astronaut.angle+90.0) / 360.0f) * PI * 2.0;
+                Flt rad = (-(g->astronaut.angle-89.0) / 360.0f) * PI * 2.0;
                 //convert angle to a vector
-                Flt xdir = cos(rad);
-                Flt ydir = sin(rad);
+                Flt xdir = sin(rad);
+                Flt ydir = cos(rad);
                 b->pos[0] += xdir*20.0f;
                 b->pos[1] += ydir*20.0f;
                 b->vel[0] += xdir*6.0f + rnd()*0.1;
@@ -1013,21 +970,14 @@ void render(Game *g)
 
         if (health < 100) {
             DrawHealthBox(healthBoxTexture, &healthbox);
-	    gotHealth = 0;
         }
-	if (bulletsRemain < 20){
-	    DrawAmoBox(amoBoxTexture, &amobox);
-	    gotAmo = 0;
-	}
 
         r.bot = yres - 20;
         r.left = 10;
         r.center = 0;
         ggprint8b(&r, 16, 0x00ff0000, "CS3350 - Space Escape");
-        ggprint8b(&r, 16, 0x00ffff00, "Bullets Remaining: %i", 
-			bulletsRemain);
-        ggprint8b(&r, 16, 0x00ffff00, "Asteroids Remaining: %i", 
-			g->nasteroids);
+        ggprint8b(&r, 16, 0x00ffff00, "Bullets Remaining: %i", bulletsRemain);
+        ggprint8b(&r, 16, 0x00ffff00, "Asteroids Remaining: %i", g->nasteroids);
 
         // Display and decrease health when colliding with asteroid
         // Chris added
@@ -1041,12 +991,9 @@ void render(Game *g)
             //-------------------------------------------------------------------------
             //Draw the astronaut
             //glColor3fv(g->astronaut.color);
-            glPushMatrix();
-            glTranslatef(g->astronaut.pos[0], g->astronaut.pos[1], 
-		    	g->astronaut.pos[2]);
-            //float angle = atan2(astronaut.dir[1], astronaut.dir[0]);
-            glRotatef(g->astronaut.angle, 0.0f, 0.0f, 1.0f);
-            glBegin(GL_TRIANGLES);
+
+	    /*
+           // glBegin(GL_TRIANGLES);
             //glVertex2f(-10.0f, -10.0f);
             //glVertex2f(  0.0f, 20.0f);
             //glVertex2f( 10.0f, -10.0f);
@@ -1057,6 +1004,7 @@ void render(Game *g)
             glVertex2f(  0.0f, 20.0f);
             glVertex2f( 12.0f, -10.0f);
             glEnd();
+	    */
             //glColor3f(1.0f, 0.0f, 0.0f);
             glBegin(GL_POINTS);
             glVertex2f(0.0f, 0.0f);
@@ -1121,6 +1069,20 @@ void render(Game *g)
             strandedGame(xres, yres, pbox);	    
             pause_game = 1;
         }
+            glPushMatrix();
+            glTranslatef(g->astronaut.pos[0], g->astronaut.pos[1], g->astronaut.pos[2]);
+            //float angle = atan2(astronaut.dir[1], astronaut.dir[0]);
+            glRotatef(g->astronaut.angle, 0.0f, 0.0f, 1.0f);
+            glBindTexture(GL_TEXTURE_2D, silhouette_astronautpicTexturepic);
+	    glEnable(GL_ALPHA_TEST);
+	    glAlphaFunc(GL_GREATER, 0.0f);
+            glBegin(GL_QUADS);
+            glTexCoord2f(0.0f, 1.0f); glVertex2i(-20,-20);
+            glTexCoord2f(0.0f, 0.0f); glVertex2i(-20,20);
+            glTexCoord2f(1.0f, 0.0f); glVertex2i(20,20);
+            glTexCoord2f(1.0f, 1.0f); glVertex2i(20,-20);
+	    glEnd();
+            glPopMatrix();
 
         //-------------------------------------------------------------------------
         //Draw the asteroids
@@ -1154,11 +1116,7 @@ void render(Game *g)
                 //glEnd();
                 a = a->next;
             }
-	if (fuel < 100) {
-	    DrawFuelBox(fuelBoxTexture, &fuelbox);
-	    gotFuel = 0;
-	}
-
         }
+
     }
 }

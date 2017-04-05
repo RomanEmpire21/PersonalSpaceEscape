@@ -39,7 +39,7 @@ void healthbar(int x, int y, Rect r, int &health)
     glEnd(); 
     glEnable(GL_TEXTURE_2D);
     glColor3f(0.0,1.0,0.0);
-    if (healthView <= 20) {
+    if (healthView <= 100) {
 	glColor3f(1.0,0.0,0.0);
     }
 
@@ -59,7 +59,7 @@ void healthbar(int x, int y, Rect r, int &health)
 }
 
 void buildHealthBox(HealthBox *h) {
-    h->radius = 37;
+    h->radius = 30;
     h->angle = 0.0f;
     h->pos[0] = (Flt)(rand() % xres);
     h->pos[1] = (Flt)(rand() % xres);
@@ -93,10 +93,10 @@ void DrawHealthBox(GLuint healthBoxTexture, HealthBox *h) {
     // The 20's are used to draw around the center.
     // Center is 0 so going + and - lets us draw around
     // the center.
-    glTexCoord2f(0.0f, 1.0f); glVertex2i(-12,-20);
-    glTexCoord2f(0.0f, 0.0f); glVertex2i(-12,20);
-    glTexCoord2f(1.0f, 0.0f); glVertex2i(12,20);
-    glTexCoord2f(1.0f, 1.0f); glVertex2i(12,-20);
+    glTexCoord2f(0.0f, 1.0f); glVertex2i(-20,-20);
+    glTexCoord2f(0.0f, 0.0f); glVertex2i(-20,20);
+    glTexCoord2f(1.0f, 0.0f); glVertex2i(20,20);
+    glTexCoord2f(1.0f, 1.0f); glVertex2i(20,-20);
     glEnd();
     glPopMatrix();
     glBegin(GL_POINTS);

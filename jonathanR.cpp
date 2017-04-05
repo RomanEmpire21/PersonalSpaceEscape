@@ -20,7 +20,7 @@ void astronautCollision(Game *g, int &health)
 	d2 = g->astronaut.pos[0] - a->pos[0];
 	d3 = g->astronaut.pos[1] - a->pos[1];
 	dist2 = (d2*d2 + d3*d3);
-	if (dist2 < (a->radius)*(a->radius)) {
+	if (dist2 < (a->radius*2)*(a->radius*2)) {
 	    //std::cout << "asteroid hit." << std::endl;
 	    //this asteroid is hit.
 
@@ -137,14 +137,13 @@ int remainingAmo(int bulletsRemain)
     }
 }
 // Reduces number of bullets remaining
-int reduceAmo(int bulletsRemain)
-{
+int reduceAmo(int bulletsRemain){
     return --bulletsRemain;
 }
 
-int getHealthPack(Game *g, HealthBox *healthbox, int &health)
+void getHealthPack(Game *g, HealthBox *healthbox, int &health)
 {
-    // Attempt to detect collision between health pach and
+    // Attempt to detect collision between asteroid and
     // astronaut
     Flt d2, d3, dist2;
     d2 = g->astronaut.pos[0] - healthbox->pos[0];
@@ -153,118 +152,6 @@ int getHealthPack(Game *g, HealthBox *healthbox, int &health)
     if (dist2 < healthbox->radius*healthbox->radius) {
 	// You can come into the radius of the healthbox
 	health += 50;
-	return 1;
     }
-    return 0;
-}
-int getFuelPack(Game *g, FuelBox *fuelbox, float &fuel)
-{
-    // Attempt to detect collision between fuel pack and
-    // astronaut
-    Flt d2, d3, dist2;
-    d2 = g->astronaut.pos[0] - fuelbox->pos[0];
-    d3 = g->astronaut.pos[1] - fuelbox->pos[1];
-    dist2 = (d2*d2 + d3*d3);
-    if (dist2 < fuelbox->radius*fuelbox->radius) {
-	// You can come into the radius of the fuel pack
-	fuel += 100;
-	return 1;
-    }
-    return 0;
 }
 
-int getAmoPack(Game *g, AmoBox *amobox, int &bulletsRemain)
-{
-    // Attempt to detect collision between amo pack and
-    // astronaut
-    Flt d2, d3, dist2;
-    d2 = g->astronaut.pos[0] - amobox->pos[0];
-    d3 = g->astronaut.pos[1] - amobox->pos[1];
-    dist2 = (d2*d2 + d3*d3);
-    if (dist2 < amobox->radius*amobox->radius) {
-	// You can come into the radius of the amo pack
-	bulletsRemain += 15;
-	return 1;
-    }
-    return 0;
-}
-
-// Initialize the values of the FuelBox struct
-void buildFuelBox(FuelBox *f)
-{
-    f->radius = 45;
-    f->angle = 0.0f;
-    f->pos[0] = 100;//(Flt)(rand() % xres);
-    f->pos[1] = 100;//(Flt)(rand() % xres);
-    f->pos[2] = 0.0f;
-    f->angle = 0.0;
-
-    f->rotate = rnd() * 4.0 - 2.0;
-
-    f->vel[0] = (Flt)(rnd()/2);
-    f->vel[1] = (Flt)(rnd()/2);    
-
-}
-
-// Displays Fuel.ppm image
-void DrawFuelBox(GLuint fuelBoxTexture, FuelBox *f)
-{
-
-    glPushMatrix();
-    glTranslatef(f->pos[0], f->pos[1], f->pos[2]);
-    glRotatef(f->angle+10, 0.0f, 0.0f, 1.0f);
-
-    // Texture
-    glBindTexture(GL_TEXTURE_2D, fuelBoxTexture);
-    glBegin(GL_QUADS);
-    // Center is 0 so going + and - lets us draw around
-    // the center.
-    glTexCoord2f(0.0f, 1.0f); glVertex2i(-15,-25);
-    glTexCoord2f(0.0f, 0.0f); glVertex2i(-15,25);
-    glTexCoord2f(1.0f, 0.0f); glVertex2i(15,25);
-    glTexCoord2f(1.0f, 1.0f); glVertex2i(15,-25);
-    glEnd();
-    glPopMatrix();
-    glBegin(GL_POINTS);
-    // glVertex2f(a->pos[0], a->pos[1]);
-    glEnd();
-
-}
-
-// Initialize the values of the AmoBox struct
-void buildAmoBox(AmoBox *a)
-{
-    a->radius = 35;
-    a->angle = 0.0f;
-    a->pos[0] = (Flt)(rand() % xres);
-    a->pos[1] = (Flt)(rand() % xres);
-    a->pos[2] = 0.0f;
-    a->angle = 0.0;
-
-    a->rotate = rnd() * 10.0 - 2.0;
-    a->vel[0] = (Flt)(rnd()/2);
-    a->vel[1] = (Flt)(rnd()/2);    
-}
-
-// Display AmoPack.ppm image
-void DrawAmoBox(GLuint amoBoxTexture, AmoBox *a){
-
-    glPushMatrix();
-    glTranslatef(a->pos[0], a->pos[1], a->pos[2]);
-    glRotatef(a->angle+10, 0.0f, 0.0f, 1.0f);
-
-    // Texture
-    glBindTexture(GL_TEXTURE_2D, amoBoxTexture);
-    glBegin(GL_QUADS);
-    // Center is 0 so going + and - lets us draw around
-    // the center.
-    glTexCoord2f(0.0f, 1.0f); glVertex2i(-15,-20);
-    glTexCoord2f(0.0f, 0.0f); glVertex2i(-15,20);
-    glTexCoord2f(1.0f, 0.0f); glVertex2i(15,20);
-    glTexCoord2f(1.0f, 1.0f); glVertex2i(15,-20);
-    glEnd();
-    glPopMatrix();
-    glBegin(GL_POINTS);
-    // glVertex2f(a->pos[0], a->pos[1]);
-    glEnd();
-}
