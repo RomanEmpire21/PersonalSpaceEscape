@@ -85,6 +85,7 @@ int sound = 1;
 /********************************************************/
 
 GLuint silhouetteTexture;
+GLuint silhouette_astronautpicTexturepic;
 
 Ppmimage *healthBox = NULL;
 GLuint healthBoxTexture;
@@ -97,6 +98,9 @@ GLuint amoBoxTexture;
 
 Ppmimage *Asteroidpic = NULL;
 GLuint AsteroidTexturepic;
+
+Ppmimage *astronautpic = NULL;
+GLuint astronautpicTexturepic;
 
 int xres=1250, yres=900;
 // Added by Joe
@@ -353,6 +357,20 @@ void init_opengl(void)
 
 
 
+    astronautpic= ppm6GetImage("./Images/Astronaut.ppm");
+    glGenTextures(1, &astronautpicTexturepic);
+    glBindTexture(GL_TEXTURE_2D, astronautpicTexturepic);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, 3,
+            astronautpic->width, astronautpic->height,
+            0, GL_RGB, GL_UNSIGNED_BYTE, astronautpic->data);
+
+
+
+
+
+
     int w = Asteroidpic->width;
     int h = Asteroidpic->height;
 
@@ -364,7 +382,20 @@ void init_opengl(void)
     glTexImage2D(GL_TEXTURE_2D, 0,GL_RGBA, w, h, 0,
             GL_RGBA, GL_UNSIGNED_BYTE, silhouetteData);
 
+
+    glGenTextures(1, &silhouette_astronautpicTexturepic);
+    glBindTexture(GL_TEXTURE_2D, silhouette_astronautpicTexturepic);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    unsigned char *silhouetteData2 = buildAlphaData(astronautpic);
+    glTexImage2D(GL_TEXTURE_2D, 0,GL_RGBA, w, h, 0,
+            GL_RGBA, GL_UNSIGNED_BYTE, silhouetteData2);
+
+
+
+
     free(silhouetteData);
+    free(silhouetteData2);
 
 
 
@@ -973,14 +1004,14 @@ void physics(Game *g)
                 Bullet *b = &g->barr[g->nbullets];
                 timeCopy(&b->time, &bt);
                 b->pos[0] = g->astronaut.pos[0];
-                b->pos[1] = g->astronaut.pos[1];
+                b->pos[1] = g->astronaut.pos[1]+4;
                 b->vel[0] = g->astronaut.vel[0];
                 b->vel[1] = g->astronaut.vel[1];
                 //convert astronaut angle to radians
-                Flt rad = ((g->astronaut.angle+90.0) / 360.0f) * PI * 2.0;
+                Flt rad = (-(g->astronaut.angle-89.0) / 360.0f) * PI * 2.0;
                 //convert angle to a vector
-                Flt xdir = cos(rad);
-                Flt ydir = sin(rad);
+                Flt xdir = sin(rad);
+                Flt ydir = cos(rad);
                 b->pos[0] += xdir*20.0f;
                 b->pos[1] += ydir*20.0f;
                 b->vel[0] += xdir*6.0f + rnd()*0.1;
@@ -1041,6 +1072,7 @@ void render(Game *g)
             //-------------------------------------------------------------------------
             //Draw the astronaut
             //glColor3fv(g->astronaut.color);
+/*
             glPushMatrix();
             glTranslatef(g->astronaut.pos[0], g->astronaut.pos[1], 
 		    	g->astronaut.pos[2]);
@@ -1062,7 +1094,7 @@ void render(Game *g)
             glVertex2f(0.0f, 0.0f);
             glEnd();
             glPopMatrix();
-
+*/
             // Jonathan
             // Added second condition to stop rendering
             // thrust coming out of astronaut
@@ -1074,18 +1106,18 @@ void render(Game *g)
                 if (fuelRemains(fuel)) {
                     fuel = reduceFuel(fuel);
                 }
-                Flt rad = ((g->astronaut.angle+90.0) / 360.0f) * PI * 2.0;
+                Flt rad = (((g->astronaut.angle+90.0) / 360.0f) * PI * 2.0);
                 //convert angle to a vector
                 Flt xdir = cos(rad);
                 Flt ydir = sin(rad);
                 Flt xs,ys,xe,ye,r;
                 glBegin(GL_LINES);
                 for (i=0; i<8; i++) {
-                    xs = -xdir * 11.0f + rnd() * 8.0 - 2.0;
-                    ys = -ydir * 11.0f + rnd() * 8.0 - 2.0;
+                    xs = (-xdir * 11.0f + rnd() * 8.0 - 2.0);
+                    ys = (-ydir * 11.0f + rnd() * 8.0 - 2.0);
                     r = rnd()+30.0;
-                    xe = -xdir * r + rnd() * 18.0 - 9.0;
-                    ye = -ydir * r + rnd() * 18.0 - 9.0;
+                    xe = (-xdir * r + rnd() * 18.0 - 9.0);
+                    ye = (-ydir * r + rnd() * 18.0 - 9.0);
                     glColor3f(rnd()*.3+.7, rnd()*.3+.7, 0);
                     glVertex2f(g->astronaut.pos[0]+xs,g->astronaut.pos[1]+ys);
                     glVertex2f(g->astronaut.pos[0]+xe,g->astronaut.pos[1]+ye);
@@ -1121,6 +1153,22 @@ void render(Game *g)
             strandedGame(xres, yres, pbox);	    
             pause_game = 1;
         }
+
+            glPushMatrix();
+            glTranslatef(g->astronaut.pos[0], g->astronaut.pos[1], g->astronaut.pos[2]);
+            //float angle = atan2(astronaut.dir[1], astronaut.dir[0]);
+            glRotatef(g->astronaut.angle, 0.0f, 0.0f, 1.0f);
+            glBindTexture(GL_TEXTURE_2D, silhouette_astronautpicTexturepic);
+            glEnable(GL_ALPHA_TEST);
+            glAlphaFunc(GL_GREATER, 0.0f);
+            glBegin(GL_QUADS);
+            glTexCoord2f(0.0f, 1.0f); glVertex2i(-20,-20);
+            glTexCoord2f(0.0f, 0.0f); glVertex2i(-20,20);
+            glTexCoord2f(1.0f, 0.0f); glVertex2i(20,20);
+            glTexCoord2f(1.0f, 1.0f); glVertex2i(20,-20);
+            glEnd();
+            glPopMatrix();
+
 
         //-------------------------------------------------------------------------
         //Draw the asteroids
