@@ -17,7 +17,6 @@ void astronautCollision(Game *g, int &health)
     // astronaut
     Flt d2, d3, dist2;
     Flt d4, d5, dist4;
-    Flt d6, d7, dist6;
     while(a){
 	d2 = g->astronaut.pos[0] - a->pos[0];
 	d3 = g->astronaut.pos[1] - a->pos[1];
