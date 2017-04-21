@@ -30,6 +30,13 @@ const float gravity = -0.2f;
 const int MAX_BULLETS = 100;
 const Flt MINIMUM_ASTEROID_SIZE = 60.0;
 
+typedef double Arr[3];
+struct Sprite {
+        Arr pos;
+	    Arr vel;
+};
+
+
 //-----------------------------------------------------------------------------
 //Setup timers
 const double physicsRate = 1.0 / 60.0;
@@ -41,6 +48,10 @@ extern double timeSpan;
 extern double timeDiff(struct timespec *start, struct timespec *end);
 extern void timeCopy(struct timespec *dest, struct timespec *source);
 extern int ShowBackground();
+extern Sprite bullet_sprite;
+extern Ppmimage *bulletImage;
+extern GLuint bulletTexture;
+
 //-----------------------------------------------------------------------------
 
 struct Astronaut {
@@ -97,6 +108,15 @@ struct HealthBox {
     float rotate;
 
 };
+struct Vector {
+        float x, y, z;
+};
+struct Shape {
+        float width, height;
+	    float radius;
+	        Vector center;
+};
+
 
 struct FuelBox {
     Vec pos;
@@ -184,6 +204,9 @@ void fuelbar(int x, int y, Rect r, float &fuel);
 
 void buildHealthBox(HealthBox *h);
 void DrawHealthBox(GLuint, HealthBox *h);
+unsigned char *buildAlphaData(Ppmimage *img);
+void menubar(int a, int b, Rect r);
+void bulletdisplay(int &bulletsRemain, Sprite bullet_sprite);
 unsigned char *buildAlphaData(Ppmimage *img);
 
 

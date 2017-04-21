@@ -78,8 +78,8 @@ GLuint Level5Texture;
 int background = 1;
 
 // **Sounds**
-ALuint alBuffer[8];
-ALuint alSource[8];
+ALuint alBuffer[9];
+ALuint alSource[9];
 int sound = 1;
 // End of Sean's Global Variables
 /********************************************************/
@@ -101,6 +101,11 @@ GLuint AsteroidTexturepic;
 
 Ppmimage *astronautpic = NULL;
 GLuint astronautpicTexturepic;
+
+Ppmimage *bulletImage;
+GLuint bulletTexture;
+Sprite bullet_sprite;
+
 
 int xres=1250, yres=900;
 // Added by Joe
@@ -253,6 +258,7 @@ void init_opengl(void)
 
 
     // Created by Sean
+    system("convert ./Images/Level1.jpg ./Images/Level1.ppm");
     Level1 = ppm6GetImage("./Images/Level1.ppm");
     glGenTextures(1, &Level1Texture);
 
@@ -264,6 +270,7 @@ void init_opengl(void)
             Level1->width, Level1->height,
             0, GL_RGB, GL_UNSIGNED_BYTE, Level1->data);
 
+    system("convert ./Images/Level2.jpg ./Images/Level2.ppm");
     Level2 = ppm6GetImage("./Images/Level2.ppm");
     glGenTextures(1, &Level2Texture);
 
@@ -273,40 +280,10 @@ void init_opengl(void)
     glTexImage2D(GL_TEXTURE_2D, 0, 3,
             Level2->width, Level2->height,
             0, GL_RGB, GL_UNSIGNED_BYTE, Level2->data);
-
-    Level3 = ppm6GetImage("./Images/Level3.ppm");
-    glGenTextures(1, &Level3Texture);
-
-    glBindTexture(GL_TEXTURE_2D, Level3Texture);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, 3,
-            Level3->width, Level3->height,
-            0, GL_RGB, GL_UNSIGNED_BYTE, Level3->data);
-
-    Level4 = ppm6GetImage("./Images/Level4.ppm");
-    glGenTextures(1, &Level4Texture);
-
-    glBindTexture(GL_TEXTURE_2D, Level4Texture);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, 3,
-            Level4->width, Level4->height,
-            0, GL_RGB, GL_UNSIGNED_BYTE, Level4->data);
-
-    Level5 = ppm6GetImage("./Images/Level5.ppm");
-    glGenTextures(1, &Level5Texture);
-
-    glBindTexture(GL_TEXTURE_2D, Level5Texture);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, 3,
-            Level5->width, Level5->height,
-            0, GL_RGB, GL_UNSIGNED_BYTE, Level5->data);
-
     //End of Seans	
 
     //Chris's Code
+    system("convert ./Images/StartUpMenu.jpg ./Images/StartUpMenu.ppm");
     StartUpMenu = ppm6GetImage("./Images/StartUpMenu.ppm");
     glGenTextures(1, &StartUpMenuTexture);
 
@@ -318,6 +295,7 @@ void init_opengl(void)
             0, GL_RGB, GL_UNSIGNED_BYTE, StartUpMenu->data);
 
 
+    system("convert ./Images/Health.jpg ./Images/Health.ppm");
     healthBox= ppm6GetImage("./Images/Health.ppm");
     glGenTextures(1, &healthBoxTexture);
     glBindTexture(GL_TEXTURE_2D, healthBoxTexture);
@@ -327,6 +305,7 @@ void init_opengl(void)
             healthBox->width, healthBox->height,
             0, GL_RGB, GL_UNSIGNED_BYTE, healthBox->data);
 
+    system("convert ./Images/Fuel.jpg ./Images/Fuel.ppm");
     fuelBox= ppm6GetImage("./Images/Fuel.ppm");
     glGenTextures(1, &fuelBoxTexture);
     glBindTexture(GL_TEXTURE_2D, fuelBoxTexture);
@@ -336,6 +315,7 @@ void init_opengl(void)
             fuelBox->width, fuelBox->height,
             0, GL_RGB, GL_UNSIGNED_BYTE, fuelBox->data);
 
+    system("convert ./Images/AmoPack.jpg ./Images/AmoPack.ppm");
     amoBox= ppm6GetImage("./Images/AmoPack.ppm");
     glGenTextures(1, &amoBoxTexture);
     glBindTexture(GL_TEXTURE_2D, amoBoxTexture);
@@ -346,6 +326,7 @@ void init_opengl(void)
             0, GL_RGB, GL_UNSIGNED_BYTE, amoBox->data);
 
 
+    system("convert ./Images/Asteroid.jpg ./Images/Asteroid.ppm");
     Asteroidpic= ppm6GetImage("./Images/Asteroid.ppm");
     glGenTextures(1, &AsteroidTexturepic);
     glBindTexture(GL_TEXTURE_2D, AsteroidTexturepic);
@@ -357,6 +338,7 @@ void init_opengl(void)
 
 
 
+    system("convert ./Images/Astronaut.jpg ./Images/Astronaut.ppm");
     astronautpic= ppm6GetImage("./Images/Astronaut.ppm");
     glGenTextures(1, &astronautpicTexturepic);
     glBindTexture(GL_TEXTURE_2D, astronautpicTexturepic);
@@ -365,6 +347,17 @@ void init_opengl(void)
     glTexImage2D(GL_TEXTURE_2D, 0, 3,
             astronautpic->width, astronautpic->height,
             0, GL_RGB, GL_UNSIGNED_BYTE, astronautpic->data);
+
+    glGenTextures(1, &bulletTexture);
+    bulletImage = ppm6GetImage("./Images/bullet.ppm");
+    int w3 = bulletImage->width;
+    int h3 = bulletImage->height;
+    glBindTexture(GL_TEXTURE_2D, bulletTexture);
+    //
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, 3, w3, h3, 0, GL_RGB, GL_UNSIGNED_BYTE, bulletImage->data);
+
 
 
 
@@ -425,9 +418,9 @@ void init_openal(void)
     alBuffer[5] = alutCreateBufferFromFile("./Sounds/Level3.wav");
     alBuffer[6] = alutCreateBufferFromFile("./Sounds/Level4.wav");
     alBuffer[7] = alutCreateBufferFromFile("./Sounds/Level5.wav");
+    alBuffer[8] = alutCreateBufferFromFile("./Sounds/Explosion.wav");	
 
-
-    alGenSources(8, alSource);
+    alGenSources(9, alSource);
     alSourcei(alSource[0], AL_BUFFER, alBuffer[0]);
     alSourcei(alSource[1], AL_BUFFER, alBuffer[1]);
     alSourcei(alSource[2], AL_BUFFER, alBuffer[2]);
@@ -436,10 +429,15 @@ void init_openal(void)
     alSourcei(alSource[5], AL_BUFFER, alBuffer[5]);
     alSourcei(alSource[6], AL_BUFFER, alBuffer[6]);
     alSourcei(alSource[7], AL_BUFFER, alBuffer[7]);
+    alSourcei(alSource[8], AL_BUFFER, alBuffer[8]);	
 
     alSourcef(alSource[0], AL_GAIN, 1.0f);
     alSourcef(alSource[0], AL_PITCH, 1.0f);
     alSourcei(alSource[0], AL_LOOPING, AL_FALSE);
+
+    alSourcef(alSource[8], AL_GAIN, 1.0f);
+    alSourcef(alSource[8], AL_PITCH, 1.0f);
+    alSourcei(alSource[8], AL_LOOPING, AL_FALSE);
 
 
     for (int i=1; i<8; i++) {
@@ -909,8 +907,9 @@ void physics(Game *g)
             dist = (d0*d0 + d1*d1);
             if (dist < (a->radius*a->radius)) {
                 //std::cout << "asteroid hit." << std::endl;
-                //this asteroid is hit.
-                if (a->radius > MINIMUM_ASTEROID_SIZE) {
+                //this asteroid is hit. 
+        	getAudio(8, alSource);
+		if (a->radius > MINIMUM_ASTEROID_SIZE) {
                     //break it into pieces.
                     Asteroid *ta = a;
                     buildAsteroidFragment(ta, a);
@@ -987,7 +986,6 @@ void physics(Game *g)
     }
     if (keys[XK_space]) {
         //a little time between each bullet
-        getAudio(0, alSource);
         struct timespec bt;
         clock_gettime(CLOCK_REALTIME, &bt);
         double ts = timeDiff(&g->bulletTimer, &bt);
@@ -998,7 +996,8 @@ void physics(Game *g)
             // Added additional conditional statement so that astronaut
             // does not have unlimited amount of bullets.
             if ( (g->nbullets < MAX_BULLETS) && remainingAmo(bulletsRemain)) {
-                bulletsRemain = reduceAmo(bulletsRemain);//bulletsRemain - 1;
+        	getAudio(0, alSource);
+		bulletsRemain = reduceAmo(bulletsRemain);//bulletsRemain - 1;
                 //shoot a bullet...
                 //Bullet *b = new Bullet;
                 Bullet *b = &g->barr[g->nbullets];
@@ -1062,11 +1061,13 @@ void render(Game *g)
 
         // Display and decrease health when colliding with asteroid
         // Chris added
-        healthbar(((xres/2)+350),yres-15,r, health);
+	//
+	menubar(((xres/2)),yres-835,r);
+        healthbar(((xres/2)+200),yres-825,r, health);
 
         // Display and decrease fuel when pressing up key
         // Jonathan added
-        fuelbar(((xres/2)-150),yres-15,r, fuel);
+        fuelbar(((xres/2)-190),yres-825,r, fuel);
 
         if (!pause_game) {
             //-------------------------------------------------------------------------
@@ -1171,6 +1172,7 @@ void render(Game *g)
 
 
         //-------------------------------------------------------------------------
+	bulletdisplay(bulletsRemain,bullet_sprite);
         //Draw the asteroids
         {
             Asteroid *a = g->ahead;

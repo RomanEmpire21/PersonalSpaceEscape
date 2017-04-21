@@ -75,14 +75,23 @@ void fuelbar(int x, int y, Rect r, float &fuel)
 {
     float fuelView = fuel;// - 150;
     // glDisable(GL_TEXTURE_2D);
-    glColor3f(0.0,0.0,0.0);
+    glColor3f(0.01,0.23,0.25);
     float cx = x;
     int cy = y;
     glBegin(GL_QUADS);
-    glVertex2i(cx-155,cy+15);
-    glVertex2i(cx+155,cy+15);
-    glVertex2i(cx+155,cy-15);
-    glVertex2i(cx-155,cy-15);
+
+    glVertex2i(cx-155,80/*cy+15*/);
+    glVertex2i(cx+155,80/*cy+15*/);
+    glVertex2i(cx+155,50/*cy-15*/);
+    glVertex2i(cx-155,50/*cy-15*/);
+
+
+
+    /*
+       glVertex2i(cx-155,cy+15);
+       glVertex2i(cx+155,cy+15);
+       glVertex2i(cx+155,cy-15);
+       glVertex2i(cx-155,cy-15);*/
     glEnd();
     glEnable(GL_TEXTURE_2D);
     glColor3f(0.0,1.0,0.0);
@@ -91,14 +100,19 @@ void fuelbar(int x, int y, Rect r, float &fuel)
     }
 
     glBegin(GL_QUADS);
-    glVertex2i(cx-150,cy+10);
+    glVertex2i(cx-150,75/*cy+10*/);
+    glVertex2i(cx+fuelView-150,75/*cy+10*/);
+    glVertex2i(cx+fuelView-150,55/*cy-10*/);
+    glVertex2i(cx-150,55/*cy-10*/);
 
     // Setting up location of box
-    glVertex2i(cx+fuelView-150,cy+10);
-    glVertex2i(cx+fuelView-150,cy-10);
-    glVertex2i(cx-150,cy-10);
+    /*
+    glVertex2i(cx-150,cy+10);
+       glVertex2i(cx+fuelView-150,cy+10);
+       glVertex2i(cx+fuelView-150,cy-10);
+       glVertex2i(cx-150,cy-10);*/
     glEnd();
-    r.bot = cy -5;
+    r.bot = 60;//cy -5;
     r.left = cx ;
     r.center = 1;
     //glEnable(GL_TEXTURE_2D);		If you want to see amount

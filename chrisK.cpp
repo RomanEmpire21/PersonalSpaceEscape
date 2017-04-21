@@ -23,19 +23,55 @@
 #include "typedefine.h"
 
 
+extern int xres;
+extern int yres;
+
+
+void menubar(int a, int b, Rect r) {
+    int ca = a;
+    int cb = b;
+    glColor3f(0.01,0.23,0.25);
+    glBegin(GL_QUADS);
+    glVertex2i(ca-400,135/*cb+70*/);
+    glVertex2i(ca+400,135/*cb+70*/);
+    glVertex2i(ca+400,5/*cb-70*/);
+    glVertex2i(ca-400,5/*cb-70*/);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+
+    glColor3f(0.0,0.0,0.0);
+    glBegin(GL_QUADS);
+    glVertex2i(ca-395,130/*cb+65*/);
+    glVertex2i(ca+395,130/*cb+65*/);
+    glVertex2i(ca+395,10/*cb-60*/);
+    glVertex2i(ca-395,10/*cb-60*/);
+    glEnd();
+    glEnable(GL_TEXTURE_2D);
+    r.bot = 20;//cb -50;
+    r.left = ca -320;
+    r.center = 1;
+    glEnable(GL_TEXTURE_2D);
+    ggprint8b(&r,20,0x00ffffff, "Ammo:");
+    r.bot = 100;//cb +35;
+    r.left = ca -320;
+    ggprint8b(&r,20,0x00ffffff, "Lives:");
+    r.bot = 100;//cb +35;
+    r.left = ca +70;
+    ggprint8b(&r,20,0x00ffffff, "Score:");
+}
 
 void healthbar(int x, int y, Rect r, int &health) 
 {
     int healthView = health;
     // glDisable(GL_TEXTURE_2D);
-    glColor3f(0.0,0.0,0.0);
+    glColor3f(0.01,0.23,0.25);
     int cx = x;
     int cy = y;
     glBegin(GL_QUADS);
-    glVertex2i(cx-155,cy+15);
-    glVertex2i(cx+155,cy+15);
-    glVertex2i(cx+155,cy-15);
-    glVertex2i(cx-155,cy-15);
+    glVertex2i(cx-155,80/*cy+15*/);
+    glVertex2i(cx+155,80/*cy+15*/);
+    glVertex2i(cx+155,50/*cy-15*/);
+    glVertex2i(cx-155,50/*cy-15*/);
     glEnd(); 
     glEnable(GL_TEXTURE_2D);
     glColor3f(0.0,1.0,0.0);
@@ -44,12 +80,12 @@ void healthbar(int x, int y, Rect r, int &health)
     }
 
     glBegin(GL_QUADS);
-    glVertex2i(cx-150,cy+10);
-    glVertex2i(cx+healthView-150,cy+10);
-    glVertex2i(cx+healthView-150,cy-10);
-    glVertex2i(cx-150,cy-10);
+    glVertex2i(cx-150,75/*cy+10*/);
+    glVertex2i(cx+healthView-150,75/*cy+10*/);
+    glVertex2i(cx+healthView-150,55/*cy-10*/);
+    glVertex2i(cx-150,55/*cy-10*/);
     glEnd(); 
-    r.bot = cy -5;
+    r.bot = 60;//cy -5;
     r.left = cx ;
     r.center = 1;
     //glEnable(GL_TEXTURE_2D);		If you want to see amount
@@ -137,3 +173,42 @@ unsigned char *buildAlphaData(Ppmimage *img)
         }
         return newdata;
 }
+
+void bulletdisplay(int &bulletsRemain, Sprite bullet_sprite) {
+   
+    glColor3ub(90,140,90);
+   // Shape *s;
+   // s= &g->box[0];
+//    glPushMatrix();
+    //glTranslatef(s->center.x,s->center.y,s->center.z);
+   // float w,h;
+   // w = s->width;
+    //h = s->height;
+    int dist =0;
+    dist = bulletsRemain*20;
+    if(bulletsRemain != 0) {
+        for(int i=0; i <bulletsRemain; i++) {
+            bullet_sprite.pos[0] = xres/2 - 285 +(i *20);
+            bullet_sprite.pos[1] = 25;//yres - 880;
+            bullet_sprite.pos[2] = 0;
+                float wid = 10.0f;
+                glPushMatrix();
+                glTranslatef(bullet_sprite.pos[0], bullet_sprite.pos[1],
+                bullet_sprite.pos[2]);
+                glBindTexture(GL_TEXTURE_2D, bulletTexture);
+                glEnable(GL_ALPHA_TEST);
+                glAlphaFunc(GL_GREATER, 0.0f);
+                glColor4ub(255,255,255,255);
+                glBegin(GL_QUADS);
+                    glTexCoord2f(1.0f, 1.0f); glVertex2i(-wid*0.7,-wid*0.7);
+                    glTexCoord2f(1.0f, 0.0f); glVertex2i(-wid*0.7, wid*0.7);
+                    glTexCoord2f(0.0f, 0.0f); glVertex2i( wid*0.7, wid*0.7);
+                    glTexCoord2f(0.0f, 1.0f); glVertex2i( wid*0.7,-wid*0.7);
+                glEnd();
+                glPopMatrix();
+                glDisable(GL_ALPHA_TEST);
+            }
+        }
+        glColor4ub(255,255,255,255);
+}
+
