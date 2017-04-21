@@ -27,9 +27,9 @@ extern int xres;
 extern int yres;
 
 
-void menubar(int a, int b, Rect r) {
+void menubar(int a, int b, Rect r, int score){
     int ca = a;
-    int cb = b;
+    //int cb = b;
     glColor3f(0.01,0.23,0.25);
     glBegin(GL_QUADS);
     glVertex2i(ca-400,135/*cb+70*/);
@@ -57,7 +57,7 @@ void menubar(int a, int b, Rect r) {
     ggprint8b(&r,20,0x00ffffff, "Lives:");
     r.bot = 100;//cb +35;
     r.left = ca +70;
-    ggprint8b(&r,20,0x00ffffff, "Score:");
+    ggprint8b(&r,20,0x00ffffff, "Score: %i", score );
 }
 
 void healthbar(int x, int y, Rect r, int &health) 
@@ -66,7 +66,7 @@ void healthbar(int x, int y, Rect r, int &health)
     // glDisable(GL_TEXTURE_2D);
     glColor3f(0.01,0.23,0.25);
     int cx = x;
-    int cy = y;
+    //int cy = y;
     glBegin(GL_QUADS);
     glVertex2i(cx-155,80/*cy+15*/);
     glVertex2i(cx+155,80/*cy+15*/);
@@ -173,6 +173,9 @@ unsigned char *buildAlphaData(Ppmimage *img)
         }
         return newdata;
 }
+int Score(int score){
+    return score + 10;
+}
 
 void bulletdisplay(int &bulletsRemain, Sprite bullet_sprite) {
    
@@ -184,8 +187,8 @@ void bulletdisplay(int &bulletsRemain, Sprite bullet_sprite) {
    // float w,h;
    // w = s->width;
     //h = s->height;
-    int dist =0;
-    dist = bulletsRemain*20;
+    //int dist =0;
+    //dist = bulletsRemain*20;
     if(bulletsRemain != 0) {
         for(int i=0; i <bulletsRemain; i++) {
             bullet_sprite.pos[0] = xres/2 - 285 +(i *20);

@@ -16,11 +16,18 @@ void astronautCollision(Game *g, int &health)
     // Attempt to detect collision between asteroid and
     // astronaut
     Flt d2, d3, dist2;
+    Flt d4, d5, dist4;
+    Flt d6, d7, dist6;
     while(a){
 	d2 = g->astronaut.pos[0] - a->pos[0];
 	d3 = g->astronaut.pos[1] - a->pos[1];
 	dist2 = (d2*d2 + d3*d3);
-	if (dist2 < (a->radius)*(a->radius)) {
+
+	d4 = g->astronaut.pos[0] - a->pos[0];
+	d5 = (g->astronaut.pos[1]+20) - a->pos[1];
+	dist4 = (d4*d4 + d5*d5);
+
+	if (dist2 < (a->radius)*(a->radius) || dist4 < (a->radius)*(a->radius)) {
 	    //std::cout << "asteroid hit." << std::endl;
 	    //this asteroid is hit.
 
@@ -77,21 +84,13 @@ void fuelbar(int x, int y, Rect r, float &fuel)
     // glDisable(GL_TEXTURE_2D);
     glColor3f(0.01,0.23,0.25);
     float cx = x;
-    int cy = y;
+    //int cy = y;
     glBegin(GL_QUADS);
 
-    glVertex2i(cx-155,80/*cy+15*/);
-    glVertex2i(cx+155,80/*cy+15*/);
-    glVertex2i(cx+155,50/*cy-15*/);
-    glVertex2i(cx-155,50/*cy-15*/);
-
-
-
-    /*
-       glVertex2i(cx-155,cy+15);
-       glVertex2i(cx+155,cy+15);
-       glVertex2i(cx+155,cy-15);
-       glVertex2i(cx-155,cy-15);*/
+    glVertex2i(cx-155,80);
+    glVertex2i(cx+155,80);
+    glVertex2i(cx+155,50);
+    glVertex2i(cx-155,50);
     glEnd();
     glEnable(GL_TEXTURE_2D);
     glColor3f(0.0,1.0,0.0);
@@ -99,20 +98,14 @@ void fuelbar(int x, int y, Rect r, float &fuel)
 	glColor3f(1.0,0.0,0.0);
     }
 
-    glBegin(GL_QUADS);
-    glVertex2i(cx-150,75/*cy+10*/);
-    glVertex2i(cx+fuelView-150,75/*cy+10*/);
-    glVertex2i(cx+fuelView-150,55/*cy-10*/);
-    glVertex2i(cx-150,55/*cy-10*/);
-
     // Setting up location of box
-    /*
-    glVertex2i(cx-150,cy+10);
-       glVertex2i(cx+fuelView-150,cy+10);
-       glVertex2i(cx+fuelView-150,cy-10);
-       glVertex2i(cx-150,cy-10);*/
+    glBegin(GL_QUADS);
+    glVertex2i(cx-150,75);
+    glVertex2i(cx+fuelView-150,75);
+    glVertex2i(cx+fuelView-150,55);
+    glVertex2i(cx-150,55);
     glEnd();
-    r.bot = 60;//cy -5;
+    r.bot = 60;
     r.left = cx ;
     r.center = 1;
     //glEnable(GL_TEXTURE_2D);		If you want to see amount
@@ -132,7 +125,7 @@ int fuelRemains(float fuel)
 // Reduces the fuel the astronaut has left
 float reduceFuel(float fuel)
 {
-    fuel = fuel - .2;
+    fuel = fuel - .1;
     //So that fuel does not go negative..
     if (fuel < 0) {
 	fuel = 0;

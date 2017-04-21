@@ -205,8 +205,8 @@ void fuelbar(int x, int y, Rect r, float &fuel);
 void buildHealthBox(HealthBox *h);
 void DrawHealthBox(GLuint, HealthBox *h);
 unsigned char *buildAlphaData(Ppmimage *img);
-void menubar(int a, int b, Rect r);
+void menubar(int a, int b, Rect r, int score);
 void bulletdisplay(int &bulletsRemain, Sprite bullet_sprite);
 unsigned char *buildAlphaData(Ppmimage *img);
-
+int Score(int score);
 
